@@ -30,4 +30,28 @@ SELECT name, CHAR_LENGTH(name) AS name_length
 UPDATE employees 
   SET name = TRIM(name)
   WHERE CHAR_LENGTH(name) <> CHAR_LENGTH(TRIM(name));
+ 
+-- REPLACE: 置換
+SELECT REPLACE("I like an apple", "apple", "lemon");
+ 
+SELECT * FROM users WHERE name LIKE 'Mrs%';
+SELECT REPLACE(name, "Mrs", "Ms") FROM users WHERE name LIKE 'Mrs%';
 
+UPDATE users SET name = REPLACE(name, "Mrs", "Ms") WHERE name LIKE 'Mrs%';
+
+SELECT * FROM users;
+
+-- UPPER LOWER(大文字、小文字)
+
+SELECT UPPER("apple"); 
+SELECT LOWER("APPLE");
+ 
+SELECT name, UPPER(name), LOWER(name) FROM users;
+
+-- SUBSTRING 一部取り出し
+SELECT SUBSTRING(name,2,3), name FROM employees; -- nameの2文字目から3文字分取り出す
+
+SELECT * FROM employees WHERE SUBSTR(name,2,1) = "田";
+
+-- REVERSE: 逆順にする
+SELECT REVERSE(name), name FROM employees; 
