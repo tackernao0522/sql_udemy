@@ -208,3 +208,43 @@ SET birth_era = CASE
 END
 
 SELECT * FROM users;
+
+# CASEでNULLを扱う場合
+# 以下のように記述しても正しく動作しない
+/*
+ 	SELECT
+ 		CASE "Japan" THEN "日本人"
+ 			WHEN "Japan" THEN "日本人"
+ 			WHEN NULL THEN "不明"
+ 		END
+ 	FROM
+ 		uses;
+*/
+
+# 以下のように記述する
+/*
+ 	SELECT
+ 		CASE
+ 			WHEN country="Japan" THEN "日本人"
+ 			WHEN country IS NULL THEN "不明"
+ 		END
+ 	FROM
+ 		users;
+*/
+
+SELECT * FROM customers WHERE name IS NULL;
+
+SELECT *,
+	CASE
+		WHEN name IS NULL THEN "不明"
+		ELSE ""
+	END AS "NULL CHECK"
+FROM customers WHERE name IS NULL;
+
+SELECT *,
+	CASE
+		WHEN name IS NULL THEN "不明"
+		WHEN name IS NOT NULL THEN "NULL以外"
+		ELSE ""
+	END AS "NULL CHECK"
+FROM customers;
