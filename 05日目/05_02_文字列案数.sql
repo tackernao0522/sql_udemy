@@ -54,4 +54,4 @@ SELECT SUBSTRING(name,2,3), name FROM employees; -- nameの2文字目から3文�
 SELECT * FROM employees WHERE SUBSTR(name,2,1) = "田";
 
 -- REVERSE: 逆順にする
-SELECT REVERSE(name), name FROM employees; 
+SELECT REVERSE(name), name FROM employees;
