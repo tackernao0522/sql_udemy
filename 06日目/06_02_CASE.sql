@@ -118,5 +118,93 @@ SELECT
 		WHEN student_id % 3 = 2 THEN test_score_3
 	END AS score
 FROM tests_score;
-	
-	
+
+# ORDER BYでCASEを使用する
+
+/*
+ * CASEは汎用性が高く、ORDER BYの中でも利用することができる
+ * ORDER BY CASE ・・・END ASC(DESC)
+ */
+
+/*
+# ORDER BYで、四国のものとその他のものを順番に並び替える
+
+SELECT
+	CASE
+		WHEN name IN("香川", "愛媛", "徳島", "高知") THEN "四国"
+		ELSE "その他"
+	END AS "地域名"
+FROM prefectures ORDER BY CASE
+	WHEN name IN ("香川", "愛媛", "徳島", "高知") THEN "四国"
+	ELSE "その他"
+END DESC;
+*/
+
+SELECT *,
+CASE
+	WHEN name IN("香川県", "愛媛県", "徳島県", "高知県") THEN "四国"	
+	WHEN name IN("兵庫県", "大阪府", "京都府", "滋賀県", "奈良県", "三重県", "和歌山県") THEN "近畿"
+	ELSE "その他"
+	END AS "地域名"
+ FROM prefectures
+ ORDER BY
+ CASE
+ 	WHEN name IN("香川県", "愛媛県", "徳島県", "高知県") THEN "四国"	
+	WHEN name IN("兵庫県", "大阪府", "京都府", "滋賀県", "奈良県", "三重県", "和歌山県") THEN "近畿"
+	ELSE "その他"
+ END DESC;
+
+SELECT *,
+CASE
+	WHEN name IN("香川県", "愛媛県", "徳島県", "高知県") THEN "四国"	
+	WHEN name IN("兵庫県", "大阪府", "京都府", "滋賀県", "奈良県", "三重県", "和歌山県") THEN "近畿"
+	ELSE "その他"
+	END AS "地域名"
+ FROM prefectures
+ ORDER BY
+ CASE
+ 	WHEN name IN("香川県", "愛媛県", "徳島県", "高知県") THEN 0
+	WHEN name IN("兵庫県", "大阪府", "京都府", "滋賀県", "奈良県", "三重県", "和歌山県") THEN 1
+	ELSE 2
+ END;
+
+
+# UPDATE内でCASEを利用する
+
+/*
+ UPDATEで、CASEを利用して、値を書き換えることもできる
+ UPDATE TABLE SET 値=CASE・・・
+*/
+
+/*
+  # ORDER BYで、四国のものとその他のものを順番にものを並び替えす
+  UPDATE
+  	prefectures
+  	SET name=CASE WHEN name IN("香川", "愛媛", "徳島", "高知") THEN "四国"
+  	ELSE "その他"
+  	END
+  WHERE name = "香川";
+ */
+
+SELECT * FROM users;
+
+ALTER TABLE users ADD birth_era VARCHAR(2) AFTER birth_day;
+
+SELECT *,
+CASE 
+	WHEN birth_day < "1989-01-07" THEN "昭和"
+	WHEN birth_day < "2019-05-01" THEN "平成"
+	WHEN birth_day >= "2019-05-01" THEN "令和"
+	ELSE "不明"
+END AS "元号"
+FROM users;
+
+UPDATE users
+SET birth_era = CASE 
+	WHEN birth_day < "1989-01-07" THEN "昭和"
+	WHEN birth_day < "2019-05-01" THEN "平成"
+	WHEN birth_day >= "2019-05-01" THEN "令和"
+	ELSE "不明"
+END
+
+SELECT * FROM users;
