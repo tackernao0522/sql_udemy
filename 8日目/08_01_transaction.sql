@@ -19,3 +19,25 @@ ROLLBACK;
 
 -- COMMIT(トランザクションをDBに反映)
 COMMIT;
+
+-- ROLLBACK
+ROLLBACK;
+
+SELECT * FROM students;
+
+-- id=300を削除
+DELETE FROM students WHERE id=300;
+
+-- AUTOCOMMIT確認
+SHOW VARIABLES;
+SHOW VARIABLES WHERE variable_name="autocommit";
+
+SET AUTOCOMMIT=0; -- autocommitを解除する
+
+DELETE FROM students WHERE id=299; -- commitされない
+
+-- SQL反映
+COMMIT;
+
+-- AUTOCOMMITを元に戻す
+SET AUTOCOMMIT = 1;
