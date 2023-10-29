@@ -56,3 +56,95 @@ SELECT * FROM employees
 SELECT * FROM employees
 	WHERE age < (SELECT AVG(age) FROM employees);
 
+-- 副問い合わせ4: FROMで用いる
+SELECT
+	MAX(avg_age) AS "部署ごとの平均年齢の最大"
+	FROM
+	(SELECT department_id, AVG(age) AS avg_age FROM employees GROUP BY department_id) AS tmp_emp;
+	
+SELECT
+	MAX(avg_age) AS "部署ごとの平均年齢の最大",
+	MIN(avg_age) AS "部署ごとの平均年齢の最小"
+	FROM
+	(SELECT department_id, AVG(age) AS avg_age
+		FROM employees GROUP BY department_id
+		) 
+			AS tmp_emp;
+
+-- 年代の集計
+SELECT *
+	FROM employees
+	GROUP BY id, FLOOR(age / 10);
+
+SELECT FLOOR(age / 10) * 10, COUNT(*) AS age_count 
+	FROM employees
+	GROUP BY FLOOR(age / 10) * 10;
+
+SELECT 
+	MAX(age_count),
+	MIN(age_count)
+FROM
+(SELECT FLOOR(age / 10) * 10, COUNT(*) AS age_count 
+	FROM employees
+	GROUP BY FLOOR(age / 10) * 10) AS age_summary;
+
+-- 副問い合わせ5: SELECTの中に書く
+SELECT * FROM customers;
+
+SELECT * FROM orders;
+
+SELECT
+	cs.id,
+	cs.first_name,
+	cs.last_name,
+	(
+		SELECT MAX(order_date) FROM orders AS order_max 
+		WHERE cs.id = order_max.customer_id
+	) AS "最近の注文日"
+	FROM customers AS cs
+	WHERE 
+		cs.id < 10;
+	
+SELECT
+	cs.id,
+	cs.first_name,
+	cs.last_name,
+	(
+		SELECT MAX(order_date) FROM orders AS order_max 
+		WHERE cs.id = order_max.customer_id
+	) AS "最近の注文日",
+	(
+		SELECT MIN(order_date) FROM orders AS order_max 
+		WHERE cs.id = order_max.customer_id
+	) AS "古い注文日"
+	FROM customers AS cs
+	WHERE 
+		cs.id < 10;
+	
+SELECT MAX(order_date) FROM orders AS order_max 
+		WHERE 1 = order_max.customer_id;
+	
+SELECT * FROM orders;
+
+SELECT order_amount * order_price FROM orders;
+
+SELECT
+	cs.id,
+	cs.first_name,
+	cs.last_name,
+	(
+		SELECT MAX(order_date) FROM orders AS order_max 
+		WHERE cs.id = order_max.customer_id
+	) AS "最近の注文日",
+	(
+		SELECT MIN(order_date) FROM orders AS order_max 
+		WHERE cs.id = order_max.customer_id
+	) AS "古い注文日",
+	(
+		SELECT SUM(order_amount * order_price) FROM orders AS tmp_order WHERE cs.id = tmp_order.customer_id
+	) AS "全支払い金額"
+	FROM customers AS cs
+	WHERE 
+		cs.id < 10;
+
+	
