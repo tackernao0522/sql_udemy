@@ -223,3 +223,40 @@ LAG(age,3,0) OVER(ORDER BY age),-- ３つ前、ない場合は0
 LEAD(age) OVER(ORDER BY age), -- 直後の値
 LEAD(age,2,0) OVER(ORDER BY age) -- 2つ後、ない場合は0
 FROM customers;
+
+-- FIRST_VALUE, LAST_VALUE
+SELECT
+*,
+FIRST_VALUE(first_name) OVER(PARTITION BY department_id ORDER BY age),
+LAST_VALUE(first_name) OVER(PARTITION BY department_id ORDER BY age RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+FROM employees;
+
+-- TILE
+SELECT
+age,
+NTILE(2) OVER(ORDER BY age)
+FROM
+
+SELECT
+age,
+NTILE(7) OVER(ORDER BY age)
+FROM
+
+SELECT
+age,
+NTILE(10) OVER(ORDER BY age)
+FROM
+employees;
+
+SELECT
+*
+FROM
+(SELECT
+age,
+NTILE(10) OVER(ORDER BY age) AS ntile_value
+FROM
+employees) AS tmp
+WHERE
+tmp.ntile_value = 8
+;
+
