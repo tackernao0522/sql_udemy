@@ -32,3 +32,27 @@ FROM orders;
 SELECT *,DATE_FORMAT(order_date, '%Y/%m'),
 SUM(order_amount*order_price) OVER(PARTITION BY DATE_FORMAT(order_date, '%Y/%m'))
 FROM orders;
+
+-- ORDER BY
+SELECT 
+*,
+COUNT(*) OVER() AS tmp_count
+FROM
+employees;
+
+SELECT 
+*,
+COUNT(*) OVER(ORDER BY age) AS tmp_count
+FROM
+employees;
+
+SELECT *, SUM(order_price) OVER(ORDER BY order_date) FROM orders;
+
+SELECT *, SUM(order_price) OVER(ORDER BY order_date DESC) FROM orders;
+
+SELECT *, SUM(order_price) OVER(ORDER BY order_date, customer_id) FROM orders;
+
+SELECT
+FLOOR(age/10),
+COUNT(*) OVER(ORDER BY FLOOR(age/10))
+FROM employees;
