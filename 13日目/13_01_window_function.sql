@@ -99,3 +99,96 @@ MAX(sa.payment) OVER(PARTITION BY sa.paid_date ORDER BY emp.id)
 FROM employees AS emp
 INNER JOIN salaries AS sa
 ON emp.id = sa.employee_id;
+
+-- salesテーブルのorder_price * order_amountのの合計値の7日間の平均を求める
+-- まずは、日付ごとの合計値を求める
+-- 7日平均を求める
+SELECT * FROM orders ORDER BY order_date;
+
+SELECT *, SUM(order_price * order_amount) OVER(ORDER BY order_date) FROM orders;
+
+-- これだとうまくいかない
+SELECT *,
+SUM(order_price * order_amount) 
+OVER(ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
+FROM orders;
+
+-- これで想定通りになる
+WITH daily_summary AS(
+SELECT 
+	order_date, SUM(order_price * order_amount) AS sale
+	FROM
+		orders
+	GROUP BY order_date
+)
+SELECT
+	*,
+	AVG(sale) OVER(ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) -- 6行前から現在の行まで
+FROM
+	daily_summary;
+
+-- 集計結果とemployeesテーブルを紐付けてその人ごとに給料の合計値を出す
+SELECT
+*
+FROM employees AS emp
+INNER JOIN
+(SELECT 
+	employee_id,
+	SUM(payment) AS payment
+FROM salaries
+	GROUP BY employee_id) AS summary_salary
+		ON emp.id = summary_salary.employee_id;
+
+-- 年齢ごとに並び替えて全員の給料の合計値を出す。
+SELECT
+*,
+SUM(summary_salary.payment)
+OVER(ORDER BY age) AS p_summary
+FROM employees AS emp
+INNER JOIN
+(SELECT 
+	employee_id,
+	SUM(payment) AS payment
+FROM salaries
+	GROUP BY employee_id) AS summary_salary
+		ON emp.id = summary_salary.employee_id;
+
+-- 一番最初の値から一番大きな値まで全部足している(全部同じ値になる)
+SELECT
+*,
+SUM(summary_salary.payment)
+OVER(ORDER BY age RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS p_summary
+FROM employees AS emp
+INNER JOIN
+(SELECT 
+	employee_id,
+	SUM(payment) AS payment
+FROM salaries
+	GROUP BY employee_id) AS summary_salary
+		ON emp.id = summary_salary.employee_id;
+
+SELECT
+*,
+SUM(summary_salary.payment)
+OVER(ORDER BY age RANGE BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING) AS p_summary
+FROM employees AS emp
+INNER JOIN
+(SELECT 
+	employee_id,
+	SUM(payment) AS payment
+FROM salaries
+	GROUP BY employee_id) AS summary_salary
+		ON emp.id = summary_salary.employee_id;
+
+SELECT
+*,
+SUM(summary_salary.payment)
+OVER(ORDER BY age RANGE BETWEEN 3 PRECEDING AND CURRENT ROW) AS p_summary
+FROM employees AS emp
+INNER JOIN
+(SELECT 
+	employee_id,
+	SUM(payment) AS payment
+FROM salaries
+	GROUP BY employee_id) AS summary_salary
+		ON emp.id = summary_salary.employee_id;
