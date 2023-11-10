@@ -56,3 +56,46 @@ SELECT
 FLOOR(age/10),
 COUNT(*) OVER(ORDER BY FLOOR(age/10))
 FROM employees;
+
+-- PARTITION + ORDER BY
+SELECT *,
+COUNT(*) OVER(PARTITION BY department_id)
+FROM employees;
+
+SELECT *,
+COUNT(*) OVER(PARTITION BY department_id ORDER BY age) AS count_value
+FROM employees;
+
+SELECT *,
+COUNT(age) OVER(PARTITION BY department_id ORDER BY age) AS count_value
+FROM employees;
+
+SELECT *,
+MAX(age) OVER(PARTITION BY department_id ORDER BY age) AS count_value
+FROM employees;
+
+SELECT *,
+MIN(age) OVER(PARTITION BY department_id ORDER BY age) AS count_value
+FROM employees;
+
+-- 人ごとの、最大の収入
+SELECT
+*
+FROM employees AS emp
+INNER JOIN salaries AS sa
+ON emp.id = sa.employee_id;
+
+SELECT
+*,
+MAX(payment) OVER(PARTITION BY emp.id)
+FROM employees AS emp
+INNER JOIN salaries AS sa
+ON emp.id = sa.employee_id;
+
+-- 月ごとの、合計をemployeesのIDで昇順に並び替えて出す
+SELECT
+*,
+MAX(sa.payment) OVER(PARTITION BY sa.paid_date ORDER BY emp.id)
+FROM employees AS emp
+INNER JOIN salaries AS sa
+ON emp.id = sa.employee_id;
