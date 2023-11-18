@@ -82,3 +82,28 @@ WHERE department_id IN(
 );
 
 SELECT * FROM employees;
+
+# ----------------------
+
+SELECT * FROM customers;
+
+SELECT * FROM orders;
+
+CREATE TABLE customer_orders(
+	name VARCHAR(255),
+	order_date DATE,
+	sales INT,
+	total_sales INT
+);
+
+INSERT INTO customer_orders
+SELECT
+	CONCAT(ct.last_name, ct.first_name),
+	od.order_date,
+	od.order_amount * od.order_price,
+	SUM(od.order_amount * od.order_price) OVER(PARTITION BY CONCAT(ct.last_name, ct.first_name) ORDER BY od.order_date)
+FROM customers AS ct
+INNER JOIN orders AS od
+ON ct.id = od.customer_id;
+
+SELECT * FROM customer_orders;
