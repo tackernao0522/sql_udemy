@@ -45,3 +45,40 @@ SET emp.department_name = COALESCE(dt.name, "不明")
 ;
 
 SELECT * FROM employees;
+
+-- WITHを使ったUPDATE
+
+SELECT * FROM stores;
+
+ALTER TABLE stores
+ADD all_sales INT;
+
+SELECT * FROM stores;
+
+SELECT * FROM items;
+
+SELECT * FROM orders;
+
+WITH tmp_sales AS (
+	SELECT it.store_id, SUM(od.order_amount * od.order_price) AS summary
+	FROM items AS it
+	INNER JOIN orders AS od
+	ON it.id = od.item_id
+	GROUP BY it.store_id
+)
+UPDATE stores AS st
+INNER JOIN tmp_sales AS ts
+ON st.id = ts.store_id
+SET st.all_sales = ts.summary
+;
+
+SELECT * FROM stores;
+
+-- DELETE
+
+DELETE FROM employees
+WHERE department_id IN(
+	SELECT id FROM departments WHERE name ="開発部"
+);
+
+SELECT * FROM employees;
