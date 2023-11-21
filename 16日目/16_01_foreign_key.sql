@@ -48,3 +48,78 @@ SELECT * FROM employees;
 
 -- INSERT INTO salaries VALUES(1, 1, "00000003", 1000, "2020-01-01"); employee_codeの整合性がとれずエラーになる
 INSERT INTO salaries VALUES(1, 1, "00000001", 1000, "2020-01-01");
+
+DESCRIBE students;
+
+DROP TABLE students;
+
+-- ON DELETE, ON UPDATE追加
+CREATE TABLE students(
+	id INT PRIMARY KEY,
+	name VARCHAR(255),
+	age INT,
+	school_id INT,
+	FOREIGN KEY(school_id) REFERENCES schools(id)
+	ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO students VALUES(1, "Taro", 18, 1);
+
+SELECT * FROM students;
+
+SELECT * FROM schools;
+UPDATE schools SET id=3 WHERE id=1;
+
+DELETE FROM schools;
+
+DROP TABLE students;
+
+-- ON DELETE, ON UPDATE追加(SET NULL)
+CREATE TABLE students(
+	id INT PRIMARY KEY,
+	name VARCHAR(255),
+	age INT,
+	school_id INT,
+	FOREIGN KEY(school_id) REFERENCES schools(id)
+	ON DELETE SET NULL ON UPDATE SET NULL
+);
+
+INSERT INTO schools VALUES(1, "北高校");
+
+INSERT INTO students VALUES(1, "Taro", 16, 1);
+
+SELECT * FROM students;
+
+UPDATE schools SET id=3 WHERE id=1;
+
+UPDATE students SET school_id=3 WHERE school_id IS NULL;
+
+INSERT INTO schools VALUES(2, "南高校");
+
+INSERT INTO students VALUES(2, "Taro", 16, 2);
+
+SELECT * FROM schools;
+DELETE FROM schools WHERE id=3;
+SELECT * FROM students;
+
+DROP TABLE students;
+
+-- ON DELETE, ON UPDATE追加(SET DEFAULT)
+CREATE TABLE students(
+	id INT PRIMARY KEY,
+	name VARCHAR(255),
+	age INT,
+	school_id INT DEFAULT -1,
+	FOREIGN KEY(school_id) REFERENCES schools(id)
+	ON DELETE SET DEFAULT ON UPDATE SET DEFAULT
+);
+
+SELECT * FROM schools;
+
+INSERT INTO schools VALUES(1, "北高校");
+
+INSERT INTO students VALUES(1, "Taro", 17, 1);
+
+SELECT * FROM students;
+
+-- UPDATE schools SET id=3 WHERE id=1; INNODBは不可
