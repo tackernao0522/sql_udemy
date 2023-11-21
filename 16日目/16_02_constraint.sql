@@ -59,7 +59,7 @@ INSERT INTO customers(id, name) VALUES(3, NULL); -- エラーになる
 -- CHECK制約の追加
 ALTER TABLE customers ADD CONSTRAINT check_age CHECK(age > 20); -- 既に20以下のレコードが入っているのでエラーになる
 
-ALTER TABLE customers ADD CONSTRAINT check_age CHECK(age >= 20); 
+ALTER TABLE customers ADD CONSTRAINT check_age CHECK(age >= 20);
 
 DESCRIBE customers;
 
@@ -80,3 +80,46 @@ ALTER TABLE students DROP CONSTRAINT students_ibfk_1;
 ALTER TABLE students
 ADD CONSTRAINT fk_schools_students
 FOREIGN KEY(school_id) REFERENCES schools(id);
+
+-- AUTO INCREMENT
+CREATE TABLE animals(
+	id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主キーのID(INT型)です',
+	name VARCHAR(50) NOT NULL COMMENT '動物の名前です'
+);
+
+-- COMMENTの確認
+SHOW FULL COLUMNS FROM animals;
+
+INSERT INTO animals VALUES(NULL, "Dog");
+
+SELECT * FROM animals;
+
+INSERT INTO animals(name) VALUES("Cat");
+
+-- 自動の値
+SELECT AUTO_INCREMENT FROM information_schema.tables WHERE TABLE_NAME="animals";
+
+INSERT INTO animals VALUES(4, "Panda");
+
+INSERT INTO animals VALUES(NULL, "Fish");
+
+ALTER TABLE animals AUTO_INCREMENT=100;
+
+INSERT INTO animals VALUES(NULL, "Bird");
+
+SELECT * FROM animals;
+
+
+INSERT INTO animals(name)
+SELECT "Snake"
+UNION ALL
+SELECT "Dino"
+UNION ALL
+SELECT "Gibra";
+
+SELECT * FROM animals;
+
+INSERT INTO animals(name)
+SELECT name FROM animals;
+
+SELECT * FROM animals;
