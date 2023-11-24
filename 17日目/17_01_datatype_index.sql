@@ -136,3 +136,34 @@ CREATE TABLE tmp_time(
 INSERT INTO tmp_time VALUES("21:05:21.54321");
 
 SELECT * FROM tmp_time;
+
+-- DATETIME, TIMESTAMP
+CREATE TABLE tmp_datetime_timestamp(
+	val_datetime DATETIME,
+	val_timestamp TIMESTAMP,
+	val_datetime_3 DATETIME(3),
+	val_timestamp_3 TIMESTAMP(3)
+);
+
+INSERT INTO tmp_datetime_timestamp
+VALUES(CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO tmp_datetime_timestamp
+VALUES("2019/01/01 09:08:07.5432", "2019/01/01 09:08:07.5432", "2019/01/01 09:08:07.6578", "2019/01/01 09:08:07.6578");
+
+SELECT * FROM tmp_datetime_timestamp;
+
+-- 1969/01/01 00:00:01 古い日付はtimestampには入れられない
+INSERT INTO tmp_datetime_timestamp
+VALUES("1969/01/01 00:00:01", "1969/01/01 00:00:01", "1969/01/01 00:00:01", "1969/01/01 00:00:01"); -- 入れられない
+
+-- 2039/01/01 00:00:01 新しい日付はtimestampには入れられない
+INSERT INTO tmp_datetime_timestamp
+VALUES("2039/01/01 00:00:01", "2039/01/01 00:00:01", "2039/01/01 00:00:01", "2039/01/01 00:00:01"); -- 入れられない
+
+INSERT INTO tmp_datetime_timestamp
+VALUES("2039/01/01 00:00:01", "2029/01/01 00:00:01", "2039/01/01 00:00:01", "2029/01/01 00:00:01"); -- 2029年は入れられる
+
+INSERT INTO tmp_datetime_timestamp
+VALUES("9999/01/01 00:00:01", "2029/01/01 00:00:01", "2039/01/01 00:00:01", "2029/01/01 00:00:01"); -- 可能(DATETIME)
+
