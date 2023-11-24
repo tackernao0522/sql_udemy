@@ -167,3 +167,28 @@ VALUES("2039/01/01 00:00:01", "2029/01/01 00:00:01", "2039/01/01 00:00:01", "202
 INSERT INTO tmp_datetime_timestamp
 VALUES("9999/01/01 00:00:01", "2029/01/01 00:00:01", "2039/01/01 00:00:01", "2029/01/01 00:00:01"); -- 可能(DATETIME)
 
+SHOW TABLES;
+
+SELECT * FROM students;
+
+SHOW INDEX FROM students; -- idとschool_idには自動的にindexが貼られている
+
+EXPLAIN SELECT * FROM students WHERE name="Taro"; -- nameにはindexが貼られてないことの確認 typeがALLになっているとindexが貼られていない
+
+CREATE INDEX idx_students_name ON students(name); -- nameにindexを貼る
+EXPLAIN SELECT * FROM students WHERE name="Taro"; -- nameにはindexが貼られいることの確認 typeがrefになっている
+
+EXPLAIN SELECT * FROM students WHERE LOWER(name) = "taro"; -- typeがALLになっている
+
+-- 関数インデックス
+CREATE INDEX idx_students_lower_name ON students((LOWER(name)));
+EXPLAIN SELECT * FROM students WHERE LOWER(name) = "taro"; -- typeがrefになっている
+
+SHOW TABLES;
+
+SELECT * FROM users;
+
+CREATE UNIQUE INDEX isx_users_uniq_first_name ON users(first_name);
+
+INSERT INTO users(id, first_name) VALUES(2, "ABC");
+INSERT INTO users(id, first_name) VALUES(3, "ABC"); -- uniqueインデックスを貼ったのでエラーになる(first_nameは同じ値を入れられなくなる)
