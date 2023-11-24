@@ -101,3 +101,38 @@ SELECT * FROM managers;
 SELECT * FROM managers WHERE is_superuser=true;
 
 SELECT * FROM managers WHERE is_superuser=false;
+
+-- DATE TIME
+CREATE TABLE alerms(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	alerm_day DATE,
+	alerm_time TIME,
+	create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+SELECT CURRENT_TIMESTAMP, NOW(), CURRENT_DATE, CURRENT_TIME;
+
+INSERT INTO alerms(alerm_day, alerm_time) VALUES("2019-01-01", "19:50:21");
+INSERT INTO alerms(alerm_day, alerm_time) VALUES("2021/01/15", "195031");
+
+SELECT * FROM alerms;
+UPDATE alerms SET alerm_time = CURRENT_TIME WHERE  id = 1;
+
+SELECT HOUR(alerm_time), alerm_time FROM alerms;
+SELECT MINUTE(alerm_time), alerm_time FROM alerms;
+SELECT SECOND(alerm_time), alerm_time FROM alerms;
+SELECT MONTH(alerm_day), SECOND(alerm_time), alerm_time FROM alerms;
+SELECT DAY(alerm_day), SECOND(alerm_time), alerm_time FROM alerms;
+SELECT DATE_FORMAT(alerm_day, '%Y'), SECOND(alerm_time), alerm_time FROM alerms;
+SELECT DATE_FORMAT(alerm_day, '%M'), SECOND(alerm_time), alerm_time FROM alerms;
+SELECT DATE_FORMAT(alerm_day, '%m'), SECOND(alerm_time), alerm_time FROM alerms;
+SELECT DATE_FORMAT(alerm_day, '%d'), SECOND(alerm_time), alerm_time FROM alerms;
+
+CREATE TABLE tmp_time(
+	num TIME(5)
+);
+
+INSERT INTO tmp_time VALUES("21:05:21.54321");
+
+SELECT * FROM tmp_time;
