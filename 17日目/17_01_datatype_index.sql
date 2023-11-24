@@ -8,3 +8,96 @@ CREATE TABLE messages(
 
 INSERT INTO messages VALUES("00000001", "Yoshida Takeshi", "aaaaba");
 INSERT INTO messages VALUES("00000002", "Yoshida Yusaku", "aaaaba");
+
+-- INT系
+CREATE TABLE patients(
+	id SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, -- 0〜65535
+	name VARCHAR(50),
+	age TINYINT UNSIGNED DEFAULT 0 -- 0〜255
+);
+
+INSERT INTO patients(name, age) VALUES("Sachiko", 34);
+
+SELECT * FROM patients;
+
+INSERT INTO patients(name, age) VALUES("Sachiko", 434); -- 入らない
+INSERT INTO patients(name, age) VALUES("Sachiko", 255); -- 入る
+
+INSERT INTO patients(id, name) VALUES(65536, "Yoshio"); -- 入らない 65535まで
+
+ALTER TABLE patients MODIFY id MEDIUMINT UNSIGNED AUTO_INCREMENT; -- 0〜16777215
+
+SHOW FULL COLUMNS FROM patients;
+
+-- heightカラム、weightカラムの追加
+ALTER TABLE patients ADD COLUMN(height FLOAT);
+
+ALTER TABLE patients ADD COLUMN(weight FLOAT);
+
+SELECT * FROM patients;
+
+INSERT INTO patients(name, age, height, weight) VALUES("Taro", 44, 175.6789, 67.8934);
+
+INSERT INTO patients(name, age, height, weight) VALUES("Taro", 44, 175.67891234, 67.893456767);
+
+CREATE TABLE tmp_float(
+	num FLOAT
+);
+
+INSERT INTO tmp_float VALUES(12345678); -- 丸められてしまう
+INSERT INTO tmp_float VALUES(12345); -- 正確に入る
+INSERT INTO tmp_float VALUES(12345.5); -- 6個目までは正確に入る
+INSERT INTO tmp_float VALUES(12345.58); -- 7個目になると丸められてしまう 
+
+SELECT * FROM tmp_float;
+
+CREATE TABLE tmp_double(
+	num DOUBLE
+);
+
+INSERT INTO tmp_double VALUES(1234567); -- 正確な値が入る
+INSERT INTO tmp_double VALUES(123456789); -- 正確な値が入る
+INSERT INTO tmp_double VALUES(123456789.123456); -- 正確な値が入る
+INSERT INTO tmp_double VALUES(123456789.123456789); -- 最後の9が丸められる
+
+SELECT * FROM tmp_double;
+
+SELECT num+2, num FROM tmp_float; -- 計算すると余計におかしな値になってしまうことのある例
+
+-- DECIMAL 計算の時に使うと良い (金融系など)
+ALTER TABLE patients ADD COLUMN score DECIMAL(7, 3); -- 整数部: 4, 少数部: 3
+
+SELECT * FROM patients;
+
+INSERT INTO patients(name, age, score) VALUES('Jiro', 54, 32.456);
+
+CREATE TABLE tem_decimal(
+	num_float FLOAT,
+	num_double DOUBLE,
+	num_decimal DECIMAL(20, 10)
+);
+
+RENAME TABLE tem_decimal TO tmp_decimal;
+
+INSERT INTO tmp_decimal VALUES(1111111111.1111111111, 1111111111.1111111111, 1111111111.1111111111);
+
+SELECT * FROM tmp_decimal;
+
+SELECT num_decimal, num_decimal*2 + 2 FROM tmp_decimal;
+SELECT num_decimal, (num_decimal*2 + 2)/2 FROM tmp_decimal;
+
+-- 論理型
+CREATE TABLE managers(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(50),
+	is_superuser BOOLEAN
+);
+
+INSERT INTO managers(name, is_superuser) VALUES("Taro", true);
+INSERT INTO managers(name, is_superuser) VALUES("Jiro", false);
+
+SELECT * FROM managers;
+
+SELECT * FROM managers WHERE is_superuser=true;
+
+SELECT * FROM managers WHERE is_superuser=false;
