@@ -76,3 +76,101 @@ EXPLAIN ANALYZE SELECT * FROM customers WHERE first_name="Olivia" OR age=42;
     -> Filter: ((customers.first_name = 'Olivia') or (customers.age = 42))  (cost=50524 rows=50331) (actual time=0.129..14.7 rows=200 loops=1)
         -> Table scan on customers  (cost=50524 rows=497786) (actual time=0.123..10.9 rows=10275 loops=1)
 */
+
+-- ORDER BY, GROUP BY: 処理時間かかる、実行の前にWHEREで絞り込む
+DROP INDEX idx_customers_first_name_age ON customers;
+
+EXPLAIN ANALYZE SELECT * FROM customers ORDER BY first_name;
+/*
+-> Sort: customers.first_name  (cost=50524 rows=497786) (actual time=1204..1380 rows=500000 loops=1)
+    -> Table scan on customers  (cost=50524 rows=497786) (actual time=0.0851..468 rows=500000 loops=1)
+*/
+
+-- INDEXあり
+CREATE INDEX idx_customers_first_name ON customers(first_name);
+
+EXPLAIN ANALYZE SELECT * FROM customers ORDER BY first_name;
+/*
+-> Sort: customers.first_name  (cost=50524 rows=497786) (actual time=1155..1344 rows=500000 loops=1)
+    -> Table scan on customers  (cost=50524 rows=497786) (actual time=0.0861..464 rows=500000 loops=1)
+*/
+
+-- 強制的にINDEXを使用する
+EXPLAIN ANALYZE SELECT /*+ INDEX(customers)*/* FROM customers ORDER BY first_name;
+/*
+-> Index scan on customers using idx_customers_first_name  (cost=174225 rows=497786) (actual time=0.334..1717 rows=500000 loops=1)
+*/
+
+EXPLAIN ANALYZE SELECT * FROM customers ORDER BY id; -- 一意のカラムに対してORDER BYで絞り込んでる場合は速い
+/*
+-> Index scan on customers using PRIMARY  (cost=50524 rows=497786) (actual time=0.121..463 rows=500000 loops=1)
+*/
+
+-- GROUP BY
+EXPLAIN ANALYZE SELECT first_name,COUNT(*)  FROM customers GROUP BY first_name;
+/*
+-> Group aggregate: count(0)  (cost=100302 rows=569) (actual time=2.04..330 rows=690 loops=1)
+    -> Covering index scan on customers using idx_customers_first_name  (cost=50524 rows=497786) (actual time=0.0747..214 rows=500000 loops=1)
+*/
+
+-- ageに対してFULL SCAN
+EXPLAIN ANALYZE SELECT age,COUNT(*) FROM customers GROUP BY age;
+/*
+-> Table scan on <temporary>  (actual time=383..383 rows=49 loops=1)
+    -> Aggregate using temporary table  (actual time=383..383 rows=49 loops=1)
+        -> Table scan on customers  (cost=50524 rows=497786) (actual time=0.0638..226 rows=500000 loops=1)
+*/
+
+-- ageに対してINDEXを貼る
+CREATE INDEX idx_customers_age ON customers(age);
+
+EXPLAIN ANALYZE SELECT age,COUNT(*) FROM customers GROUP BY age;
+/*
+ -> Group aggregate: count(0)  (cost=100302 rows=50) (actual time=4.83..249 rows=49 loops=1)
+    -> Covering index scan on customers using idx_customers_age  (cost=50524 rows=497786) (actual time=0.103..201 rows=500000 loops=1)
+*/
+
+DROP INDEX idx_customers_first_name ON customers;
+DROP INDEX idx_customers_age ON customers;
+
+-- 複数のGROUP BY
+CREATE INDEX idx_customers_first_name_age ON customers(first_name, age);
+
+EXPLAIN ANALYZE SELECT first_name, age,COUNT(*) FROM customers GROUP BY first_name, age;
+/*
+ -> Group aggregate: count(0)  (cost=100302 rows=15741) (actual time=0.11..381 rows=32369 loops=1)
+    -> Covering index scan on customers using idx_customers_first_name_age  (cost=50524 rows=497786) (actual time=0.0916..247 rows=500000 loops=1)
+*/
+
+DROP INDEX idx_customers_first_name_age ON customers;
+
+-- 外部キーにインデックス
+SELECT * FROM prefectures AS pr
+INNER JOIN customers AS ct
+ON pr.prefecture_code = ct.prefecture_code AND pr.name="北海道";
+
+EXPLAIN ANALYZE SELECT * FROM prefectures AS pr
+INNER JOIN customers AS ct
+ON pr.prefecture_code = ct.prefecture_code AND pr.name="北海道";
+/*
+-> Nested loop inner join  (cost=224749 rows=49779) (actual time=0.201..2186 rows=12321 loops=1)
+    -> Filter: (ct.prefecture_code is not null)  (cost=50524 rows=497786) (actual time=0.117..707 rows=500000 loops=1)
+        -> Table scan on ct  (cost=50524 rows=497786) (actual time=0.115..632 rows=500000 loops=1)
+    -> Filter: (pr.`name` = '北海道')  (cost=0.25 rows=0.1) (actual time=0.00274..0.00275 rows=0.0246 loops=500000)
+        -> Single-row index lookup on pr using PRIMARY (prefecture_code=ct.prefecture_code)  (cost=0.25 rows=1) (actual time=0.00212..0.00217 rows=1 loops=500000)
+*/
+
+-- customersテーブルにインデックスを貼ってみる
+CREATE INDEX idx_customers_prefecture_code ON customers(prefecture_code);
+
+EXPLAIN ANALYZE SELECT * FROM prefectures AS pr
+INNER JOIN customers AS ct
+ON pr.prefecture_code = ct.prefecture_code AND pr.name="北海道";
+/*
+-> Nested loop inner join  (cost=16508 rows=59990) (actual time=0.592..72.8 rows=12321 loops=1)
+    -> Filter: (pr.`name` = '北海道')  (cost=4.95 rows=4.7) (actual time=0.0741..0.0961 rows=1 loops=1)
+        -> Table scan on pr  (cost=4.95 rows=47) (actual time=0.0679..0.0796 rows=47 loops=1)
+    -> Index lookup on ct using idx_customers_prefecture_code (prefecture_code=pr.prefecture_code)  (cost=2507 rows=12764) (actual time=0.515..71.3 rows=12321 loops=1)
+*/
+
+DROP INDEX idx_customers_prefecture_code ON customers;
