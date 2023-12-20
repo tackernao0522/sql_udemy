@@ -1,0 +1,73 @@
+SHOW DATABASES;
+
+USE day_19_21_db;
+
+-- レンジパーティション
+CREATE TABLE users_paritioned(
+	name VARCHAR(50),
+	age INT
+)
+PARTITION BY RANGE(age)(
+	PARTITION p0 VALUES LESS THAN(20),
+	PARTITION p1 VALUES LESS THAN(40),
+	PARTITION p2 VALUES LESS THAN(60)
+);
+
+INSERT INTO users_paritioned VALUES("Taro", 18);
+INSERT INTO users_paritioned VALUES("Jiro", 28);
+INSERT INTO users_paritioned VALUES("Saburo", 38);
+INSERT INTO users_paritioned VALUES("Yoshiko", 48);
+
+SELECT * FROM users_paritioned;
+SELECT * FROM users_paritioned PARTITION(p1);
+
+EXPLAIN SELECT * FROM users_paritioned;
+EXPLAIN SELECT * FROM users_paritioned WHERE age=18;
+EXPLAIN SELECT * FROM users_paritioned WHERE age<20;
+
+INSERT INTO users_paritioned VALUES("Yoko", 72); -- エラーになる
+
+-- ALTER TABLEでのパーティション変更
+ALTER TABLE users_paritioned
+PARTITION BY RANGE(age)(
+	PARTITION p0 VALUES LESS THAN(20),
+	PARTITION p1 VALUES LESS THAN(40),
+	PARTITION p2 VALUES LESS THAN(60),
+	PARTITION p_max VALUES LESS THAN(MAXVALUE)
+);
+
+INSERT INTO users_paritioned VALUES("Yoko", 72); -- 可能になった
+
+SHOW TABLES;
+
+SHOW CREATE TABLE sales_history_partitioned;
+/*
+CREATE TABLE `sales_history_partitioned` (
+  `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
+  `customer_id` mediumint unsigned DEFAULT NULL,
+  `product_id` mediumint unsigned DEFAULT NULL,
+  `sales_amount` mediumint unsigned DEFAULT NULL,
+  `sales_day` date NOT NULL DEFAULT '1970-01-01',
+  PRIMARY KEY (`id`,`sales_day`)
+) ENGINE=InnoDB AUTO_INCREMENT=2500001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+/*!50100 PARTITION BY RANGE (year(`sales_day`))
+(PARTITION p0_lt_2016 VALUES LESS THAN (2016) ENGINE = InnoDB,
+ PARTITION p1_lt_2017 VALUES LESS THAN (2017) ENGINE = InnoDB,
+ PARTITION p2_lt_2018 VALUES LESS THAN (2018) ENGINE = InnoDB,
+ PARTITION p3_lt_2019 VALUES LESS THAN (2019) ENGINE = InnoDB,
+ PARTITION p4_lt_2020 VALUES LESS THAN (2020) ENGINE = InnoDB,
+ PARTITION p5_lt_2021 VALUES LESS THAN (2021) ENGINE = InnoDB,
+ PARTITION p6_lt_max VALUES LESS THAN MAXVALUE ENGINE = InnoDB)
+ */
+
+SELECT COUNT(*) FROM sales_history_partitioned; -- パーティション化されている
+SELECT COUNT(*) FROM sales_history; -- パーティション化されていない
+
+SELECT COUNT(*) FROM sales_history
+WHERE sales_day BETWEEN "2016-01-01" AND "2016-12-31"; -- 2455ms
+
+SELECT COUNT(*) FROM sales_history_partitioned
+WHERE sales_day BETWEEN "2016-01-01" AND "2016-12-31"; -- 358ms
+
+EXPLAIN SELECT COUNT(*) FROM sales_history_partitioned
+WHERE sales_day BETWEEN "2016-01-01" AND "2016-12-31";
