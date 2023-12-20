@@ -105,3 +105,49 @@ INSERT INTO shops VALUES(8, "SHOP H", 8);
 SELECT * FROM shops PARTITION(p3);
 
 INSERT INTO shops VALUES(9, "SHOP H", 21); -- エラーになる
+
+-- ハッシュパーティション
+CREATE TABLE h_partition(
+    name VARCHAR(50),
+    partition_key INT
+)
+PARTITION BY HASH(partition_key)
+PARTITIONS 4;
+
+INSERT INTO h_partition VALUES
+("A", 1),
+("B", 2),
+("C", 3),
+("D", 4),
+("E", 5),
+("F", 6),
+("G", 7),
+("H", 8);
+
+SELECT * FROM h_partition PARTITION(p0);
+SELECT * FROM h_partition PARTITION(p1);
+SELECT * FROM h_partition PARTITION(p3);
+
+INSERT INTO h_partition VALUES("J", 8);
+SELECT * FROM h_partition PARTITION(p0);
+
+CREATE TABLE k_partition(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(59)
+)
+PARTITION BY KEY()
+PARTITIONS 2;
+
+INSERT INTO k_partition(name) VALUES
+("A"),
+("B"),
+("C"),
+("D"),
+("E"),
+("F"),
+("G"),
+("H"),
+("I");
+
+SELECT * FROM k_partition PARTITION(p0);
+SELECT * FROM k_partition PARTITION(p1);
