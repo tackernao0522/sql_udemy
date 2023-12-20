@@ -151,3 +151,41 @@ INSERT INTO k_partition(name) VALUES
 
 SELECT * FROM k_partition PARTITION(p0);
 SELECT * FROM k_partition PARTITION(p1);
+
+-- サブパーティション
+CREATE TABLE order_history(
+	id INT,
+	amount INT,
+	order_date DATE
+)
+PARTITION BY RANGE(YEAR(order_date))
+SUBPARTITION BY HASH(id)(
+	PARTITION p0 VALUES LESS THAN(2010)(
+		SUBPARTITION s0,
+		SUBPARTITION s1
+	),
+	PARTITION p1 VALUES LESS THAN(2015)(
+		SUBPARTITION s2,
+		SUBPARTITION s3
+	),
+		PARTITION p2 VALUES LESS THAN(MAXVALUE)(
+		SUBPARTITION s4,
+		SUBPARTITION s5
+	)
+);
+
+INSERT INTO order_history VALUES
+(1, 10000, "2008-01-01"),
+(2, 10000, "2009-01-01"),
+(3, 10000, "2008-11-01"),
+(4, 10000, "2009-02-01"),
+(5, 10000, "2018-01-01"),
+(6, 10000, "2012-01-01");
+
+SELECT * FROM order_history PARTITION(p0);
+SELECT * FROM order_history PARTITION(s1);
+
+EXPLAIN SELECT * FROM order_history WHERE order_date < "2009-01-01";
+
+-- 統計情報の更新
+ALTER TABLE order_history ANALYZE PARTITION s0;
