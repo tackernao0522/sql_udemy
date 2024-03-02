@@ -26,9 +26,9 @@ SELECT * FROM users WHERE birth_place NOT IN ("France", "Germany", "Italy"); # �
 */
 -- SELECT + IN
 # SELECT customer_id FROM receipts WHERE id < 10;
-SELECT * FROM customers WHERE id IN (SELECT customer_id FROM receipts);
-SELECT * FROM customers WHERE id IN (SELECT customer_id FROM receipts WHERE id < 10);
-SELECT * FROM customers WHERE id NOT IN (SELECT customer_id FROM receipts WHERE id < 10);
+SELECT * FROM customers WHERE id IN (SELECT customer_id FROM receipts); # customersのidがcustomer_idに入っている人だけ取り出す
+SELECT * FROM customers WHERE id IN (SELECT customer_id FROM receipts WHERE id < 10); # receiptsのidが10以下でcustomersのidがcustomer_idに入っている人だけ取り出す
+SELECT * FROM customers WHERE id NOT IN (SELECT customer_id FROM receipts WHERE id < 10); # receiputsのidが10以下でcustomersのidがcustomer_idに入っている人以外を取り出す 上記と逆
 
 -- ANY
 /*
@@ -44,8 +44,8 @@ SELECT * FROM customers WHERE id NOT IN (SELECT customer_id FROM receipts WHERE 
  * WHERE price < ANY (SELECT price FROM goods WHERE id > 5);
 */
 SELECT age FROM employees WHERE salary > 5000000;
-SELECT * FROM users WHERE age > ANY(SELECT age FROM employees WHERE salary > 5000000);
-SELECT * FROM users WHERE age = ANY(SELECT age FROM employees WHERE salary > 5000000);
+SELECT * FROM users WHERE age > ANY(SELECT age FROM employees WHERE salary > 5000000); # SELECT age FROM employees WHERE salary > 5000000の結果が一番小さいageよりも大きいusersのage
+SELECT * FROM users WHERE age = ANY(SELECT age FROM employees WHERE salary > 5000000); # SELECT age FROM employees WHERE salary > 5000000の結果のいずれか等しいものを取得
 
 -- ALL
 /*
@@ -60,7 +60,8 @@ SELECT * FROM users WHERE age = ANY(SELECT age FROM employees WHERE salary > 500
  * WHERE price < ALL (SELECT price FROM goods WHERE id > 5);
 */
 
-SELECT * FROM users WHERE age > ALL(SELECT age FROM employees WHERE salary > 5000000);
+SELECT * FROM users WHERE age > ALL(SELECT age FROM employees WHERE salary > 5000000); # 取り出したageの全てよりも大きいもの(一番大きなageの値よりも大きいもの
+SELECT MAX(age) FROM employees WHERE salary > 5000000; # 45なので上記は45より大きいusersのage
 
 --  AND
 /*
