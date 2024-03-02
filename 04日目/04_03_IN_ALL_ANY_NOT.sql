@@ -92,7 +92,7 @@ SELECT * FROM employees WHERE department = " 営業部 " AND name LIKE "%田%" A
 */
 
 SELECT * FROM employees WHERE department = " 営業部 " OR department = " 開発部 ";
-SELECT * FROM employees WHERE department IN (" 営業部 ", " 開発部 ");
+SELECT * FROM employees WHERE department IN (" 営業部 ", " 開発部 "); # 上記と同じ結果
 
 -- AND + OR
 /*
