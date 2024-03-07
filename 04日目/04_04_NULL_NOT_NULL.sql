@@ -1,7 +1,7 @@
 -- 4日目のDocumentのnullの評価式を確認する
 -- IN + NULL
 SELECT * FROM customers WHERE name IS NULL; # NULLの人を取得する
-SELECT * FROM customers WHERE name IN ("河野 文典", "稲田 季雄") OR name IS NULL;
+SELECT * FROM customers WHERE name IN ("河野 文典", "稲田 季雄") OR name IS NULL; # 評価は ture or nullで trueになる(（）の中もNULLも取得できることになる)
 
 -- NOT IN
 SELECT * FROM customers WHERE name NOT IN ("河野 文典", "稲田 季雄", NULL);
