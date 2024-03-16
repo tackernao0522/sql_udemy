@@ -10,9 +10,9 @@ SELECT FLOOR(3.84); -- 3
 
 SELECT CEILING (3.14); -- 4 切り上げ
 
-SELECT RAND(); -- 0〜1のランダムな数値
-SELECT RAND() * 10; -- 0〜10のランダムな値
-SELECT FLOOR(RAND() * 10); -- 小数点以下が切り捨てられる
+SELECT RAND(); -- 0〜1の小数のランダム値を取得する (0, 1は含まない) 例: 0.4895061492
+SELECT RAND() * 10; -- 0〜10のランダム値を取得する 例: 8.8306905877
+SELECT FLOOR(RAND() * 10); -- 整数0〜10の値がランダムに取得される 小数点以下が切り捨てられる
 
 -- POWER(べき乗)
 SELECT POWER(3,4); -- 81.0
