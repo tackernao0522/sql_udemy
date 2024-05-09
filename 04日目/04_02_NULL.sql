@@ -5,7 +5,7 @@ DESCRIBE customers;
 -- IS NULLでないと取り出せない
 SELECT * FROM customers WHERE name IS NULL;
 
-SELECT NULL IS NULL;
+SELECT NULL IS NULL; -- 1と表示され真となる
 
 -- IS NOT NULL
 SELECT * FROM  customers WHERE name IS NOT NULL;
