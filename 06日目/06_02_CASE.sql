@@ -108,6 +108,7 @@ SELECT
 	END AS "うるう年か"	
 FROM users;
 
+-- student_idが3で割り切れる場合は、test_score_1の値を表示、student_idを3で割った余りが1の場合はtest_score_2の値を表示、student_idを3で割った余りが2の場合はtest_score_3の値を表示
 SELECT * FROM tests_score;
 
 SELECT
