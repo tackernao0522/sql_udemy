@@ -25,7 +25,7 @@ SELECT name, age, IF(age < 20, "未成年", "成人") FROM users;
 # SELECT IF(100 < 200 AND 300 < 200, "真", "偽"); # 偽と表示
 SELECT * FROM students;
 
-SELECT *, IF(class_no AND height > 170, "6組の170cm以上の人", "その他") FROM students;
+SELECT *, IF(class_no=6 AND height >= 170, "6組の170cm以上の人", "その他") FROM students;
 
 # IFでカラムの取得結果を変換する
 # SELECT IF (name LIKE "T%", "Tで始まる名前です", "Tで始まらない名前です") FROM users;
